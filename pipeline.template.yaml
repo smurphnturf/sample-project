@@ -65,7 +65,7 @@ Resources:
     Condition: IsProdStage
     Type: AWS::SNS::Topic
     Properties:
-      DisplayName: !Sub ${Branch}-notifications-${AWS::Region}
+      DisplayName: !Sub ${Suffix}-notifications-${AWS::Region}
 
   DynamicPipelineCleanupDev:
     Type: "AWS::CloudFormation::CustomResource"
@@ -77,8 +77,8 @@ Resources:
       StackName:
         !If
           - IsProdStage
-          - !Sub ${Branch}-dev
-          - !Sub ${Branch}-dev-${Suffix}
+          - !Sub ${Suffix}-dev
+          - !Sub ${RepoName}-dev-${Suffix}
 
   DynamicPipelineCleanupProd:
     Condition: IsProdStage
@@ -88,7 +88,7 @@ Resources:
       ServiceToken: !Ref DynamicPipelineCleanupLambdaArn
       RoleArn: !Sub arn:aws:iam::${ProdAwsAccountId}:role/CodePipelineServiceRole-${AWS::Region}-${ProdAwsAccountId}-prod
       Region: !Ref AWS::Region
-      StackName: !Sub ${Branch}-prod
+      StackName: !Sub ${Suffix}-prod
 
   Pipeline:
     Type: AWS::CodePipeline::Pipeline
@@ -140,13 +140,13 @@ Resources:
               Configuration:
                 ActionMode: CHANGE_SET_REPLACE
                 Capabilities: CAPABILITY_IAM
-                ChangeSetName: !Sub ${Branch}-change-set-${Suffix}
+                ChangeSetName: !Sub ${Suffix}-change-set-${Suffix}
                 RoleArn: !Sub arn:aws:iam::${DevAwsAccountId}:role/CodePipelineDeploymentRole-${AWS::Region}-${DevAwsAccountId}-dev
                 StackName:
                   !If
                     - IsProdStage
-                    - !Sub ${Branch}-dev
-                    - !Sub ${Branch}-dev-${Suffix}
+                    - !Sub ${Suffix}-dev
+                    - !Sub ${RepoName}-dev-${Suffix}
                 TemplatePath: BuildArtifact::sample-transformed.yaml
                 TemplateConfiguration: BuildArtifact::sample-configuration-dev.json
               RoleArn: !Sub arn:aws:iam::${DevAwsAccountId}:role/CodePipelineServiceRole-${AWS::Region}-${DevAwsAccountId}-dev
@@ -160,13 +160,13 @@ Resources:
               Configuration:
                 ActionMode: CHANGE_SET_EXECUTE
                 Capabilities: CAPABILITY_IAM
-                ChangeSetName: !Sub ${Branch}-change-set-${Suffix}
+                ChangeSetName: !Sub ${RepoName}-change-set-${Suffix}
                 RoleArn: !Sub arn:aws:iam::${DevAwsAccountId}:role/CodePipelineDeploymentRole-${AWS::Region}-${DevAwsAccountId}-dev
                 StackName:
                   !If
                     - IsProdStage
-                    - !Sub ${Branch}-dev
-                    - !Sub ${Branch}-dev-${Suffix}
+                    - !Sub ${Suffix}-dev
+                    - !Sub ${RepoName}-dev-${Suffix}
               RoleArn: !Sub arn:aws:iam::${DevAwsAccountId}:role/CodePipelineServiceRole-${AWS::Region}-${DevAwsAccountId}-dev
             - Name: SmokeTest
               RunOrder: 4
@@ -195,10 +195,10 @@ Resources:
                 Configuration:
                   ActionMode: CHANGE_SET_REPLACE
                   Capabilities: CAPABILITY_IAM
-                  ChangeSetName: !Sub ${Branch}-change-set
+                  ChangeSetName: !Sub ${Suffix}-change-set
                   RoleArn: !Sub arn:aws:iam::${ProdAwsAccountId}:role/CodePipelineDeploymentRole-${AWS::Region}-${ProdAwsAccountId}-prod
                   StackName:
-                     !Sub ${Branch}-prod
+                     !Sub ${Suffix}-prod
                   TemplatePath: BuildArtifact::sample-transformed.yaml
                   TemplateConfiguration: BuildArtifact::sample-configuration-prod.json
                 RoleArn: !Sub arn:aws:iam::${ProdAwsAccountId}:role/CodePipelineServiceRole-${AWS::Region}-${ProdAwsAccountId}-prod
@@ -223,9 +223,9 @@ Resources:
                 Configuration:
                   ActionMode: CHANGE_SET_EXECUTE
                   Capabilities: CAPABILITY_IAM
-                  ChangeSetName: !Sub ${Branch}-change-set
+                  ChangeSetName: !Sub ${Suffix}-change-set
                   RoleArn: !Sub arn:aws:iam::${ProdAwsAccountId}:role/CodePipelineDeploymentRole-${AWS::Region}-${ProdAwsAccountId}-prod
-                  StackName: !Sub ${Branch}-prod
+                  StackName: !Sub ${Suffix}-prod
                 RoleArn: !Sub arn:aws:iam::${ProdAwsAccountId}:role/CodePipelineServiceRole-${AWS::Region}-${ProdAwsAccountId}-prod
               - Name: SmokeTest
                 RunOrder: 5
@@ -290,8 +290,8 @@ Resources:
             Value:
               !If
                 - IsProdStage
-                - !Sub ${Branch}-dev
-                - !Sub ${Branch}-dev-${Suffix}
+                - !Sub ${Suffix}-dev
+                - !Sub ${RepoName}-dev-${Suffix}
           - Name: ROLE_ARN
             Type: PLAINTEXT
             Value: !Sub arn:aws:iam::${DevAwsAccountId}:role/CodePipelineServiceRole-${AWS::Region}-${DevAwsAccountId}-dev
@@ -313,7 +313,7 @@ Resources:
         EnvironmentVariables:
           - Name: STACK_NAME
             Type: PLAINTEXT
-            Value: !Sub ${Branch}-prod
+            Value: !Sub ${Suffix}-prod
           - Name: ROLE_ARN
             Type: PLAINTEXT
             Value: !Sub arn:aws:iam::${ProdAwsAccountId}:role/CodePipelineServiceRole-${AWS::Region}-${ProdAwsAccountId}-prod
@@ -337,10 +337,10 @@ Outputs:
     Description: AWS account ID for dev that was passed in as a parameter
     Value: !Ref DevAwsAccountId
     Export:
-      Name: !Sub ${Branch}-DevAwsAccountId
+      Name: !Sub ${RepoName}-DevAwsAccountId
   ProdAccountId:
     Condition: IsProdStage
     Description: AWS account ID for prod that was passed in as a parameter
     Value: !Ref ProdAwsAccountId
     Export:
-      Name: !Sub ${Branch}-ProdAwsAccountId
+      Name: !Sub ${RepoName}-ProdAwsAccountId
