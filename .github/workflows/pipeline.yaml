@@ -23,7 +23,7 @@ jobs:
           role-duration-seconds: 3600
       #- name: Push pipieline.template.yaml to s3 repo-name branch 
       # aws --profile shared-poweruser s3 cp project.template.yaml s3://au-slyp-com-shared-cross-account-template-base-poc/shared-deployments/sample-project/master/project.template.yaml --acl private
-      # aws --profile shared-poweruser s3 cp pipeline.template.yaml s3://au-slyp-com-shared-cross-account-template-base-poc/shared-deployments/sample-project/master/pipeline.template.yaml --acl private
+      # aws --profile shared-poweruser s3 cp pipeline.template.yaml s3://au-slyp-com-shared-cross-account-template-base-poc/shared-deployments/sample-project/feature/test-release-branch/pipeline.template.yaml --acl private
       - name: AWS SNS - Publish Topic w/ SessionToken
         uses: smurphnturf/publish-sns-topic@1.1-beta
         with:
