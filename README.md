@@ -7,3 +7,5 @@ aws cloudformation deploy --template-file sample-transformed.yaml --stack-name s
 
 
 {"repository":"smurphnturf/sample-project","ref":"refs/heads/feature/test-release-branch","base_ref":"","event_name":"create"}
+
+{"repository":"smurphnturf/sample-project","ref":"refs/heads/feature/test-release-branch","base_ref":"","event_name":"delete"}

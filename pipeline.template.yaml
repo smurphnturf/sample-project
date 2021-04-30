@@ -140,7 +140,7 @@ Resources:
               Configuration:
                 ActionMode: CHANGE_SET_REPLACE
                 Capabilities: CAPABILITY_IAM
-                ChangeSetName: !Sub ${Suffix}-change-set-${Suffix}
+                ChangeSetName: !Sub ${RepoName}-change-set-${Suffix}
                 RoleArn: !Sub arn:aws:iam::${DevAwsAccountId}:role/CodePipelineDeploymentRole-${AWS::Region}-${DevAwsAccountId}-dev
                 StackName:
                   !If
