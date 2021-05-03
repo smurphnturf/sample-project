@@ -1,8 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: >
-  (qs-1ph8nehb7) 
-  Serverless CICD Quick Start
-  Codepipeline shared resources and security
+  Serverless CICD Codepipeline to be deployed by PipelineMakerLambda
+  Per branch with conditional behvious depending on branch name for releases
 
 Parameters:
   RepoName: # Provided by pipeline maker lambda in shared-deployments from sns trigger
@@ -58,7 +57,12 @@ Parameters:
     Default: ''
 
 Conditions:
-  IsProdStage: !Equals [ !Ref Branch, 'master' ]
+  # Basically does the branch start with release/ we can add more steps to deploy to promoted envs
+  IsProdStage: !And [ 
+    !Not [ !Equals [ !Ref Branch, "" ]],
+    !Equals [ !Select [ 0, !Split [ 'release/', !Ref Branch ] ], "" ]
+  ]
+  
 
 Resources:
   PipelineNotificationsTopic:
